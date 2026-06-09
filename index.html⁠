@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html>
-<body>
-    <h1>ADD.Zd est en ligne !</h1>
-    <p>Si tu vois ceci, le problème venait d'une erreur de syntaxe.</p>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test ADD.Zd</title>
+</head>
+<body style="background: black; color: white;">
+    <h1>Le site fonctionne !</h1>
 </body>
 </html>
