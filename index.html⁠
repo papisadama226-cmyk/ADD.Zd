@@ -1,55 +1,566 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N-D_bot👿 Collecteur</title>
-    <link rel="manifest" href='data:application/manifest+json,{"name":"N-D_bot👿 Form","short_name":"N-D_bot","start_url":"./index.html","display":"standalone","background_color":"#ffffff","icons":[{"src":"https://i.ibb.co/HpVYdC9y/logo.png","sizes":"512x512","type":"image/png"}]}'>
-    <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; background: #f4f4f9; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input, textarea { width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #25D366; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        img#preview { max-width: 100%; margin-top: 10px; display: none; border-radius: 6px; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Formulaire WhatsApp PWA</title>
+
+  <!-- Couleurs système -->
+  <meta name="theme-color" content="#0b7a6f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="WA Form">
+  <link rel="apple-touch-icon" href="[i.ibb.co](https://i.ibb.co/HpVYdC9/y.png)">
+
+  <style>
+    :root {
+      --bg: #0a0f14;
+      --card: #121921;
+      --muted: #8aa0b4;
+      --text: #e8f0f6;
+      --accent: #0b7a6f;
+      --accent-2: #11a38f;
+      --danger: #cf3b3b;
+      --ok: #2aa84a;
+      --border: #1e2a36;
+      --focus: #2aa8ff;
+    }
+    * { box-sizing: border-box }
+    html, body { height: 100% }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      background: linear-gradient(180deg, #081018, #0a131c 60%, #0b151f);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 16px 0;
+    }
+    header img {
+      width: 40px; height: 40px; border-radius: 10px; box-shadow: 0 0 0 1px #0d2231, 0 6px 18px rgba(0,0,0,0.3);
+    }
+    header h1 {
+      font-size: 18px; margin: 0; letter-spacing: .2px;
+    }
+    main {
+      padding: 16px;
+      max-width: 680px; margin: 0 auto;
+    }
+    .card {
+      background: linear-gradient(180deg, #121921, #0f1822);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+      overflow: hidden;
+    }
+    .card .head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; justify-content: space-between;
+    }
+    .card .head .subtitle { color: var(--muted); font-size: 13px }
+    form { padding: 16px; display: grid; gap: 14px }
+    .row { display: grid; gap: 8px }
+    label { font-weight: 600; font-size: 14px }
+    .help { color: var(--muted); font-size: 12px }
+    input[type="text"], input[type="tel"], textarea {
+      width: 100%;
+      background: #0e1620;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 12px;
+      font-size: 15px;
+      outline: none;
+      transition: border .15s, box-shadow .15s;
+    }
+    textarea { min-height: 110px; resize: vertical }
+    input::placeholder, textarea::placeholder { color: #6c8297 }
+    input:focus, textarea:focus {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(42,168,255,.15);
+    }
+    .phone-group {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 8px;
+    }
+    select, .btn {
+      background: #0e1620;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 15px;
+      outline: none;
+    }
+    select:focus { border-color: var(--focus); box-shadow: 0 0 0 3px rgba(42,168,255,.15) }
+    .file-drop {
+      border: 1px dashed #2a3948;
+      background: #0d141c;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      color: var(--muted);
+      transition: border .15s, background .15s;
+    }
+    .file-drop.drag {
+      border-color: var(--accent-2);
+      background: #0f1d1b;
+    }
+    .file-drop input[type=file] { display: none }
+    .file-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-color: #214456;
+      background: linear-gradient(180deg, #0e1b25, #0d1821);
+    }
+    .btn.accent {
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      border-color: #0e6c60;
+      color: white;
+      font-weight: 600;
+    }
+    .btn.secondary { background: #13202b }
+    .btn:disabled { opacity: .6; cursor: not-allowed }
+    .preview {
+      display: grid; gap: 12px;
+      padding: 14px 16px; border-top: 1px solid var(--border);
+      background: #0f1822;
+    }
+    .preview .grid {
+      display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: start;
+    }
+    .avatar {
+      width: 96px; height: 96px; border-radius: 12px;
+      background: #0b1118; border: 1px solid var(--border);
+      display: grid; place-items: center; color: var(--muted); overflow: hidden;
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover }
+    .status { font-size: 13px; color: var(--muted) }
+    .ok { color: var(--ok) }
+    .danger { color: var(--danger) }
+    .actions {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border-top: 1px solid var(--border); background: #0d1620;
+    }
+    .link {
+      word-break: break-all; font-size: 12px; color: #9ec7ff;
+      background: #0a1320; border: 1px solid #1a2b40;
+      padding: 8px; border-radius: 8px; max-height: 90px; overflow: auto;
+    }
+    footer {
+      padding: 14px 16px; color: var(--muted); font-size: 12px; text-align: center;
+    }
+    .hidden { display: none !important }
+    @media (max-width: 560px) {
+      .phone-group { grid-template-columns: 1fr }
+      .preview .grid { grid-template-columns: 72px 1fr }
+      .avatar { width: 72px; height: 72px }
+    }
+  </style>
+
+  <!-- Manifest généré dynamiquement (href remplacé après création du Blob) -->
+  <link id="manifestLink" rel="manifest" href="#">
+
+  <link rel="icon" sizes="192x192" href="[i.ibb.co](https://i.ibb.co/HpVYdC9/y.png)">
+  <link rel="icon" type="image/png" href="[i.ibb.co](https://i.ibb.co/HpVYdC9/y.png)">
+  <meta name="description" content="PWA: formulaire avec photo, nom, numéro et message pour générer un lien wa.me et l’envoyer sur WhatsApp.">
 </head>
 <body>
+  <header>
+    <img src="[i.ibb.co](https://i.ibb.co/HpVYdC9/y.png)" alt="Logo">
+    <h1>WA Form</h1>
+  </header>
 
-<div class="card">
-    <h2>N-D_bot👿 Form</h2>
-    <input type="file" id="photo" accept="image/*" onchange="previewFile()">
-    <img id="preview" alt="Prévisualisation">
-    <input type="text" id="nom" placeholder="Nom">
-    <input type="tel" id="numero" placeholder="Numéro WhatsApp (ex: 2250700000000)">
-    <textarea id="message" placeholder="Description / Message"></textarea>
-    <button onclick="genererWhatsApp()">Envoyer sur WhatsApp</button>
-</div>
+  <main>
+    <section class="card">
+      <div class="head">
+        <div>
+          <div class="subtitle">Créez un message WhatsApp avec photo, nom, numéro et description.</div>
+        </div>
+        <button id="installBtn" class="btn secondary" type="button" title="Installer sur l'écran d'accueil">Installer</button>
+      </div>
 
-<script>
-    function previewFile() {
-        const file = document.getElementById('photo').files[0];
-        const preview = document.getElementById('preview');
-        const reader = new FileReader();
-        reader.onloadend = () => { preview.src = reader.result; preview.style.display = 'block'; }
-        if (file) reader.readAsDataURL(file);
+      <form id="waForm" novalidate>
+        <!-- Photo -->
+        <div class="row">
+          <label for="photo">Photo</label>
+          <div id="drop" class="file-drop" tabindex="0" aria-label="Zone pour déposer une image">
+            Déposez une image ici ou
+            <label class="btn" for="photoInput">choisissez un fichier</label>
+            <input id="photoInput" type="file" accept="image/*" aria-label="Importer une image">
+            <div class="file-actions">
+              <button type="button" id="clearPhoto" class="btn secondary">Retirer la photo</button>
+            </div>
+            <div class="help">Formats: JPG, PNG, WebP. Max 5 Mo.</div>
+          </div>
+        </div>
+
+        <!-- Nom -->
+        <div class="row">
+          <label for="name">Nom</label>
+          <input id="name" type="text" inputmode="text" placeholder="Ex: Alice Martin" autocomplete="name" required>
+          <div class="help">Obligatoire, 2 à 80 caractères.</div>
+        </div>
+
+        <!-- Numéro -->
+        <div class="row">
+          <label for="phone">Numéro WhatsApp</label>
+          <div class="phone-group">
+            <select id="cc">
+              <option value="">Pays/Indicatif</option>
+              <option value="33">🇫🇷 +33</option>
+              <option value="32">🇧🇪 +32</option>
+              <option value="41">🇨🇭 +41</option>
+              <option value="212">🇲🇦 +212</option>
+              <option value="213">🇩🇿 +213</option>
+              <option value="216">🇹🇳 +216</option>
+              <option value="1">🇺🇸 +1</option>
+              <option value="44">🇬🇧 +44</option>
+              <option value="49">🇩🇪 +49</option>
+              <option value="34">🇪🇸 +34</option>
+              <option value="39">🇮🇹 +39</option>
+              <option value="966">🇸🇦 +966</option>
+              <option value="971">🇦🇪 +971</option>
+              <option value="90">🇹🇷 +90</option>
+            </select>
+            <input id="phone" type="tel" inputmode="tel" placeholder="Numéro sans espaces ni 0 initial" autocomplete="tel-national" required>
+          </div>
+          <div class="help">Saisissez le numéro au format international (sans +), ou utilisez l’indicatif.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="row">
+          <label for="desc">Description / Message</label>
+          <textarea id="desc" placeholder="Votre message..."></textarea>
+          <div class="help">Les sauts de ligne seront respectés dans WhatsApp.</div>
+        </div>
+
+        <div class="actions">
+          <button id="genBtn" class="btn accent" type="submit">Générer le lien WhatsApp</button>
+          <div id="status" class="status">En attente...</div>
+        </div>
+
+        <div id="result" class="preview hidden" aria-live="polite">
+          <div class="grid">
+            <div class="avatar" id="avatar"><span>Pas d’image</span></div>
+            <div>
+              <div><strong id="outName">Nom</strong></div>
+              <div class="status">Numéro: <span id="outPhone">—</span></div>
+              <div class="status">Taille image: <span id="outImgSize">—</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="help">Lien généré:</div>
+            <div id="outLink" class="link">—</div>
+          </div>
+          <div class="actions">
+            <button id="openBtn" class="btn accent" type="button">Ouvrir dans WhatsApp</button>
+            <button id="copyBtn" class="btn" type="button">Copier le lien</button>
+            <div id="copyState" class="status"> </div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <footer>
+      Mode hors ligne activé après la première visite. Ajoutez l’app à l’écran d’accueil pour une meilleure expérience.
+    </footer>
+  </main>
+
+  <script>
+    // ------------- Utilitaires -------------
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+    function bytesToSize(bytes) {
+      if (!bytes && bytes !== 0) return "—";
+      const k = 1024, sizes = ["o","Ko","Mo","Go"];
+      const i = Math.min(Math.floor(Math.log(bytes)/Math.log(k)), sizes.length-1);
+      return (bytes/Math.pow(k,i)).toFixed(i?1:0)+" "+sizes[i];
+    }
+    function cleanPhone(raw) {
+      // Garde seulement les chiffres
+      return (raw || "").replace(/[^\d]/g, "");
+    }
+    function buildWaLink(fullDigits, msg) {
+      const base = "[wa.me](https://wa.me/)" + encodeURIComponent(fullDigits);
+      if (!msg) return base;
+      const text = encodeURIComponent(msg);
+      return base + "?text=" + text;
+    }
+    function normalizeIntl(cc, num) {
+      // Si l'utilisateur entre déjà l'indicatif au début, évite doublement
+      let digits = cleanPhone(num);
+      // Supprime 0 de tête si indicatif fourni et le numéro commence par 0 (cas FR, etc.)
+      if (cc && digits.startsWith("0")) digits = digits.replace(/^0+/, "");
+      // Si cc vide mais digits commencent par indicatif (ex: 212...), on garde tel quel
+      return (cc ? cc + digits : digits);
     }
 
-    function genererWhatsApp() {
-        const nom = document.getElementById('nom').value;
-        const numero = document.getElementById('numero').value.replace(/\D/g, '');
-        const message = document.getElementById('message').value;
-        
-        if (!numero) { alert("Veuillez entrer un numéro valide."); return; }
-        
-        const texteFinal = `Nom: ${nom}%0A%0AMessage: ${message}`;
-        window.open(`https://wa.me/${numero}?text=${texteFinal}`, '_blank');
+    // ------------- Gestion image -------------
+    const MAX_IMG = 5 * 1024 * 1024;
+    let photoFile = null;
+    let photoURL = null;
+
+    const drop = $("#drop");
+    const fileInput = $("#photoInput");
+    const clearPhotoBtn = $("#clearPhoto");
+    const avatar = $("#avatar");
+    const outImgSize = $("#outImgSize");
+
+    function setAvatarFromFile(file) {
+      if (!file) {
+        if (photoURL) URL.revokeObjectURL(photoURL);
+        photoFile = null; photoURL = null;
+        avatar.innerHTML = "<span>Pas d’image</span>";
+        outImgSize.textContent = "—";
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        setStatus("Format d’image non supporté.", true); return;
+      }
+      if (file.size > MAX_IMG) {
+        setStatus("Image trop lourde (max 5 Mo).", true); return;
+      }
+      if (photoURL) URL.revokeObjectURL(photoURL);
+      photoFile = file;
+      photoURL = URL.createObjectURL(file);
+      avatar.innerHTML = "";
+      const img = new Image();
+      img.alt = "Aperçu";
+      img.onload = () => { outImgSize.textContent = bytesToSize(file.size) + ` (${img.naturalWidth}×${img.naturalHeight})`; };
+      img.src = photoURL;
+      avatar.appendChild(img);
+      setStatus("Image chargée.", false);
     }
 
-    // Service Worker pour PWA
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch",()=>{});');
-    }
-</script>
+    fileInput.addEventListener("change", e => {
+      const f = e.target.files && e.target.files[0];
+      setAvatarFromFile(f || null);
+    });
 
+    ["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); e.stopPropagation();
+      drop.classList.add("drag");
+    }));
+    ["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => {
+      e.preventDefault(); e.stopPropagation();
+      drop.classList.remove("drag");
+    }));
+    drop.addEventListener("drop", e => {
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      setAvatarFromFile(f || null);
+    });
+    drop.addEventListener("click", () => fileInput.click());
+    clearPhotoBtn.addEventListener("click", () => setAvatarFromFile(null));
+
+    // ------------- Formulaire -------------
+    const form = $("#waForm");
+    const nameInput = $("#name");
+    const ccSelect = $("#cc");
+    const phoneInput = $("#phone");
+    const descInput = $("#desc");
+
+    const statusEl = $("#status");
+    const result = $("#result");
+    const outName = $("#outName");
+    const outPhone = $("#outPhone");
+    const outLink = $("#outLink");
+
+    const genBtn = $("#genBtn");
+    const openBtn = $("#openBtn");
+    const copyBtn = $("#copyBtn");
+    const copyState = $("#copyState");
+
+    function setStatus(msg, isError=false) {
+      statusEl.textContent = msg;
+      statusEl.classList.toggle("danger", isError);
+      statusEl.classList.toggle("ok", !isError);
+    }
+
+    function validate() {
+      // Nom: 2-80
+      const name = nameInput.value.trim();
+      if (name.length < 2 || name.length > 80) {
+        return { ok:false, msg:"Veuillez saisir un nom (2 à 80 caractères)." };
+      }
+      // Numéro
+      const cc = cleanPhone(ccSelect.value);
+      let raw = phoneInput.value.trim();
+      let full = normalizeIntl(cc, raw);
+      if (!/^\d{7,15}$/.test(full)) {
+        return { ok:false, msg:"Numéro invalide. Utilisez 7 à 15 chiffres (avec indicatif si besoin)." };
+      }
+      // Description: facultative, mais limitez la taille pour URL
+      let message = descInput.value || "";
+      // Ajoute le nom en tête du message pour clarté
+      if (name) {
+        const prefix = "Nom: " + name + "\n";
+        if (!message.startsWith(prefix)) message = prefix + message;
+      }
+      // Longueur URL: garder raisonnable
+      const previewURL = buildWaLink(full, message);
+      if (previewURL.length > 2000) {
+        return { ok:false, msg:"Message trop long pour l’URL WhatsApp. Réduisez le texte." };
+      }
+      return { ok:true, name, fullDigits:full, message, url:previewURL };
+    }
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const v = validate();
+      if (!v.ok) {
+        setStatus(v.msg, true);
+        result.classList.add("hidden");
+        return;
+      }
+      setStatus("Lien généré avec succès.", false);
+      outName.textContent = v.name;
+      outPhone.textContent = "+" + v.fullDigits;
+      outLink.textContent = v.url;
+      result.classList.remove("hidden");
+      // Action boutons
+      openBtn.onclick = () => {
+        // Tente d'ouvrir l'app, sinon l’URL web
+        window.location.href = v.url;
+      };
+      copyBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(v.url);
+          copyState.textContent = "Lien copié.";
+          setTimeout(()=>copyState.textContent="", 2000);
+        } catch {
+          copyState.textContent = "Impossible de copier automatiquement.";
+        }
+      };
+    });
+
+    // ------------- PWA: Manifest + Service Worker -------------
+    const ICON_URL = "[i.ibb.co](https://i.ibb.co/HpVYdC9/y.png)";
+    // On déclare plusieurs tailles en pointant vers le même fichier (les stores préféreront un vrai set, mais ça fonctionne)
+    const manifest = {
+      name: "WA Form",
+      short_name: "WA Form",
+      description: "Formulaire PWA pour générer et ouvrir un lien WhatsApp (wa.me) avec message.",
+      start_url: ".",
+      scope: ".",
+      display: "standalone",
+      background_color: "#0a0f14",
+      theme_color: "#0b7a6f",
+      icons: [
+        { src: ICON_URL, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+        { src: ICON_URL, sizes: "256x256", type: "image/png", purpose: "any maskable" },
+        { src: ICON_URL, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+      ]
+    };
+    // Crée un Blob pour le manifest
+    const manifestBlob = new Blob([JSON.stringify(manifest, null, 2)], { type: "application/manifest+json" });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    document.getElementById("manifestLink").setAttribute("href", manifestURL);
+
+    // Service Worker inline via Blob
+    const swCode = `
+      const CACHE = "wa-form-v1";
+      const OFFLINE_URLS = [
+        "./",
+        // Comme tout est inline, seul index.html est essentiel; icône externe est cross-origin (laissez passer réseau)
+      ];
+      self.addEventListener("install", (e) => {
+        e.waitUntil(
+          caches.open(CACHE).then(c => c.addAll(OFFLINE_URLS)).then(() => self.skipWaiting())
+        );
+      });
+      self.addEventListener("activate", (e) => {
+        e.waitUntil(
+          caches.keys().then(keys => Promise.all(keys.filter(k => k!==CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())
+        );
+      });
+      self.addEventListener("fetch", (e) => {
+        const req = e.request;
+        const url = new URL(req.url);
+        // Stratégie cache-first pour la racine
+        if (url.origin === location.origin && (url.pathname === "/" || url.pathname.endsWith("/index.html") || url.pathname === "")) {
+          e.respondWith(
+            caches.match("./").then(r => r || fetch(req).then(res => {
+              const copy = res.clone();
+              caches.open(CACHE).then(c => c.put("./", copy));
+              return res;
+            }))
+          );
+          return;
+        }
+        // Réseau par défaut
+        e.respondWith(fetch(req).catch(()=>caches.match("./")));
+      });
+    `;
+    const swBlob = new Blob([swCode], { type: "text/javascript" });
+    const swURL = URL.createObjectURL(swBlob);
+
+    let deferredPrompt = null;
+    const installBtn = document.getElementById("installBtn");
+    installBtn.disabled = true;
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", async () => {
+        try {
+          await navigator.serviceWorker.register(swURL, { scope: "./" });
+        } catch (e) {
+          console.warn("SW registration failed", e);
+        }
+      });
+    }
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.disabled = false;
+    });
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      // Optionnel: feedback
+      setStatus(outcome === "accepted" ? "Installation lancée." : "Installation annulée.");
+      deferredPrompt = null;
+      installBtn.disabled = true;
+    });
+
+    // iOS: suggestion d’ajout A2HS (iOS ne supporte pas beforeinstallprompt)
+    function isIOS() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    }
+    function isInStandalone() {
+      return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+    if (isIOS() && !isInStandalone()) {
+      // Affiche une courte info la première fois
+      const note = document.createElement("div");
+      note.style.cssText = "position:fixed;left:12px;right:12px;bottom:12px;background:#0f1822;border:1px solid #1e2a36;border-radius:12px;padding:12px;color:#cfe3f5;font-size:13px;z-index:9999";
+      note.innerHTML = "Sur iPhone, utilisez le bouton Partager puis \"Sur l’écran d’accueil\" pour installer l’application.";
+      document.body.appendChild(note);
+      setTimeout(()=>note.remove(), 8000);
+    }
+
+    // Mise en cache de cette page pour offline au premier hit (si addAll échoue côté cross-origin)
+    window.addEventListener("load", async () => {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg && navigator.onLine) {
+          const cache = await caches.open("wa-form-v1");
+          // Ajoute l’index courant (réponse) au cache
+          const resp = await fetch(location.href, { cache: "no-cache" });
+          await cache.put("./", resp);
+        }
+      } catch {}
+    });
+  </script>
 </body>
 </html>
