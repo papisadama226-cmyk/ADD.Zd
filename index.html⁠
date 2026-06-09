@@ -2,9 +2,34 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Test ADD.Zd</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADD.Zd</title>
+    <style>
+        body { background-color: #0b141a; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .box { width: 100%; max-width: 400px; background: #1f2c34; padding: 20px; border-radius: 15px; }
+        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; }
+        button { background: #00a884; color: white; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
-<body style="background: black; color: white;">
-    <h1>Le site fonctionne !</h1>
+<body>
+    <div class="box">
+        <h1>ADD.Zd</h1>
+        <input type="text" id="nom" placeholder="Ton nom">
+        <input type="tel" id="numero" placeholder="Numéro (ex: 2250103552588)">
+        <textarea id="desc" placeholder="Ta description"></textarea>
+        <button onclick="go()">Générer le lien</button>
+        <p id="res"></p>
+    </div>
+
+    <script>
+        function go() {
+            const nom = document.getElementById('nom').value;
+            const num = document.getElementById('numero').value;
+            const desc = document.getElementById('desc').value;
+            const msg = `Salut, moi c'est ${nom}. ${desc}`;
+            const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+            document.getElementById('res').innerHTML = `<a href="${url}" style="color:#00a884" target="_blank">Clique ici pour ouvrir WhatsApp</a>`;
+        }
+    </script>
 </body>
 </html>
