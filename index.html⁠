@@ -3,49 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADD.Zd</title>
+    <title>N-D_bot👿 Collecteur</title>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"N-D_bot👿 Form","short_name":"N-D_bot","start_url":"./index.html","display":"standalone","background_color":"#ffffff","icons":[{"src":"https://i.ibb.co/HpVYdC9y/logo.png","sizes":"512x512","type":"image/png"}]}'>
     <style>
-        body { background-color: #0b141a; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .box { width: 100%; max-width: 400px; background: #1f2c34; padding: 20px; border-radius: 15px; text-align: center; }
-        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; box-sizing: border-box; }
-        button { background: #00a884; color: white; font-weight: bold; cursor: pointer; }
-        #preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 10px auto; display: none; }
+        body { font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #25D366; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        img#preview { max-width: 100%; margin-top: 10px; display: none; border-radius: 6px; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h1>ADD.Zd</h1>
-        <input type="file" id="photoInput" accept="image/*" onchange="previewImg(this)">
-        <img id="preview">
-        <input type="text" id="nom" placeholder="Ton nom">
-        <input type="tel" id="numero" placeholder="Numéro (ex: 2250103552588)">
-        <textarea id="desc" placeholder="Ta description"></textarea>
-        <button onclick="go()">Générer le lien</button>
-        <p id="res"></p>
-    </div>
 
-    <script>
-        function previewImg(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = document.getElementById('preview');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        function go() {
-            const nom = document.getElementById('nom').value;
-            const num = document.getElementById('numero').value.replace(/\D/g, '');
-            const desc = document.getElementById('desc').value;
-            const msg = `Salut, moi c'est ${nom}. ${desc}`;
-            const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
-            document.getElementById('res').innerHTML = `<a href="${url}" style="color:#00a884" target="_blank">Clique ici pour ouvrir WhatsApp</a>`;
-        }
-        // Enregistrement du Service Worker
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-    </script>
+<div class="card">
+    <h2>N-D_bot👿 Form</h2>
+    <input type="file" id="photo" accept="image/*" onchange="previewFile()">
+    <img id="preview" alt="Prévisualisation">
+    <input type="text" id="nom" placeholder="Nom">
+    <input type="tel" id="numero" placeholder="Numéro WhatsApp (ex: 2250700000000)">
+    <textarea id="message" placeholder="Description / Message"></textarea>
+    <button onclick="genererWhatsApp()">Envoyer sur WhatsApp</button>
+</div>
+
+<script>
+    function previewFile() {
+        const file = document.getElementById('photo').files[0];
+        const preview = document.getElementById('preview');
+        const reader = new FileReader();
+        reader.onloadend = () => { preview.src = reader.result; preview.style.display = 'block'; }
+        if (file) reader.readAsDataURL(file);
+    }
+
+    function genererWhatsApp() {
+        const nom = document.getElementById('nom').value;
+        const numero = document.getElementById('numero').value.replace(/\D/g, '');
+        const message = document.getElementById('message').value;
+        
+        if (!numero) { alert("Veuillez entrer un numéro valide."); return; }
+        
+        const texteFinal = `Nom: ${nom}%0A%0AMessage: ${message}`;
+        window.open(`https://wa.me/${numero}?text=${texteFinal}`, '_blank');
+    }
+
+    // Service Worker pour PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch",()=>{});');
+    }
+</script>
+
 </body>
 </html>
